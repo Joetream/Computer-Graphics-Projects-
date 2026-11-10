@@ -427,3 +427,57 @@ void App::saveScreenshot(const std::string& filename) const {
         std::cout << "[Screenshot] Saved to " << outPath << "\n";
     }
 }
+
+void App::captureComparisonSuite() {
+    auto snap = [&](const std::string& relPath) {
+        for (int i = 0; i < 4; ++i) {
+            m_lighting.update(0.5f);
+            m_hierarchy.update(0.16f, m_lighting.sunDir(), &m_tourPath);
+            m_particles.update(0.16f, m_camera.position());
+            float aspect = static_cast<float>(m_width) / static_cast<float>(m_height > 0 ? m_height : 1);
+            m_frustum.extract(m_camera.projMatrix(aspect) * m_camera.viewMatrix());
+            m_riceField.updateVisibleInstances(m_frustum);
+        }
+        render();
+        glFinish();
+        saveScreenshot(relPath);
+        glfwSwapBuffers(m_window);
+        glfwPollEvents();
+    };
+
+    // 1. Keyframe A: Dawn Hero View
+    m_flags = RenderFlags{};
+    m_lighting.setPreset(0);
+    m_camera.setOrtho(false);
+    m_camera.setPose({-2.0f, 3.8f, 44.0f}, -88.0f, -3.0f);
+    snap("docs/images/render_dawn_hero.png");
+
+    // 2. Keyframe B: Bright Noon + Planar Shadows + 2D Sandbox Overlay
+    m_lighting.setPreset(1);
+    m_camera.setPose({-6.0f, 5.2f, 16.0f}, -72.0f, -8.0f);
+    m_flags.showBoard = true;
+    m_flags.clipWindow = true;
+    m_board2D.setClipEnabled(true);
+    if (m_board2D.consumeDirty()) m_texSandbox.updateSubRGBA(m_board2D.data());
+    snap("docs/images/render_noon_shadow_board.png");
+    m_flags.showBoard = false;
+
+    // 3. Keyframe C: Starry Night + 6 Point Lights
+    m_lighting.setPreset(2);
+    m_camera.setPose({0.0f, 3.6f, 42.0f}, -90.0f, -2.0f);
+    snap("docs/images/render_night_lights.png");
+
+    // 4. Wireframe Mode
+    m_lighting.setPreset(1);
+    m_camera.setPose({-8.0f, 6.0f, 12.0f}, -65.0f, -10.0f);
+    m_flags.wireframe = true;
+    snap("docs/images/render_wireframe.png");
+    m_flags.wireframe = false;
+
+    // 5. Orthographic Bird's-Eye Overview
+    m_flags.ortho = true;
+    m_camera.setOrtho(true);
+    snap("docs/images/render_ortho_birdseye.png");
+    m_flags.ortho = false;
+    m_camera.setOrtho(false);
+}

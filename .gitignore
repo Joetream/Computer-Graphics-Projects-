@@ -10,6 +10,8 @@ obj/
 *.lib
 *.pdb
 *.ilk
+third_party/glfw/
+third_party/glm/
 
 # IDE / Editor directories
 .vs/

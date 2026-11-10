@@ -115,6 +115,7 @@ void glStencilMask(GLuint mask);
 void glPolygonMode(GLenum face, GLenum mode);
 void glPolygonOffset(GLfloat factor, GLfloat units);
 void glPixelStorei(GLenum pname, GLint param);
+void glFinish(void);
 void glReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void* pixels);
 void glGenTextures(GLsizei n, GLuint* textures);
 void glDeleteTextures(GLsizei n, const GLuint* textures);
@@ -161,7 +162,7 @@ typedef void (*PFNGLUNIFORM2FVPROC)(GLint location, GLsizei count, const GLfloat
 typedef void (*PFNGLUNIFORM3FVPROC)(GLint location, GLsizei count, const GLfloat* value);
 typedef void (*PFNGLUNIFORM4FVPROC)(GLint location, GLsizei count, const GLfloat* value);
 typedef void (*PFNGLUNIFORMMATRIX3FVPROC)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);
-typedef void (*PFNGLUNIFORMMATRIX4FVPROC)(GLint location, GLsizei count, const GLfloat* value);
+typedef void (*PFNGLUNIFORMMATRIX4FVPROC)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);
 
 extern PFNGLACTIVETEXTUREPROC glad_glActiveTexture;
 extern PFNGLGENERATEMIPMAPPROC glad_glGenerateMipmap;

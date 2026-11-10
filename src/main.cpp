@@ -13,7 +13,8 @@ void framebufferSizeCallback(GLFWwindow* /*window*/, int width, int height) {
 }
 } // namespace
 
-int main() {
+int main(int argc, char** argv) {
+    bool captureAndExit = (argc > 1 && std::string(argv[1]) == "--capture");
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return -1;
@@ -58,6 +59,14 @@ int main() {
         std::cerr << "Failed to initialize Application\n";
         glfwTerminate();
         return -1;
+    }
+
+    if (captureAndExit) {
+        app.captureComparisonSuite();
+        g_app = nullptr;
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return 0;
     }
 
     double lastTime = glfwGetTime();

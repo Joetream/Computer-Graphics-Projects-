@@ -41,6 +41,7 @@ public:
     void update(float dt);
     void render();
     void saveScreenshot(const std::string& filename) const;
+    void captureComparisonSuite();
 
 private:
     GLFWwindow* m_window = nullptr;

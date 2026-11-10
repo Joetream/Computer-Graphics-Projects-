@@ -1,12 +1,18 @@
-# 延边朝鲜族民俗村·乡村振兴 — 三维数字场景设计与实现 (v1.0)
+# 延边朝鲜族民俗村·乡村振兴 — 三维数字场景设计与实现 (v1.0 & v2.0 双擎版)
 
 [![C++17](https://img.shields.io/badge/Standard-C%2B%2B17-00599C?logo=cplusplus)](https://isocpp.org/)
 [![OpenGL](https://img.shields.io/badge/OpenGL-3.3%20Core%20Profile-5586A4?logo=opengl)](https://www.opengl.org/)
-[![Pipeline](https://img.shields.io/badge/Pipeline-Custom%20Uber--Shader-E07AA0)]()
+[![Unity](https://img.shields.io/badge/Unity-6000.6.8f1%20LTS-000000?logo=unity)](https://unity.com/)
+[![Pipeline](https://img.shields.io/badge/Pipeline-Custom%20Uber--Shader%20%2B%20HLSL-E07AA0)]()
 [![License](https://img.shields.io/badge/Course%20Design-Computer%20Graphics-D9A441)]()
 
-> **《计算机图形学》课程设计完整工程（v1.0）**  
-> 本项目以**“数字光影里的延边民俗村：金秋晨曦中的振兴画卷”**为主题，基于 **C++17 + OpenGL 3.3 Core Profile（100% 可编程渲染管线）**，在一个 $200\times 200\text{ m}$ 的三维笛卡尔坐标系中有机融合**延边朝鲜族民俗文化**、**乡村振兴现代清洁能源产业**与**旅游城市互动导览**三大命题。
+> **《计算机图形学》课程设计双版本对照仓库（v1.0 原生 OpenGL + v2.0 Unity 6 双擎联动）**  
+> 本仓库同时包含 **1.0 纯手写底层渲染引擎** 与 **2.0 Unity 电影级管线升级工程**，形成“底层图形学算法推导与工业级实时渲染管线”的完整闭环：
+>
+> | 版本目录 | 技术栈 | 核心定位与亮点 | 文档入口 |
+> | :--- | :--- | :--- | :--- |
+> | **[`Computer Graphics[Projects]`](./Computer%20Graphics[Projects])** *(及仓库根目录)* | **C++17 + OpenGL 3.3 Core + GLSL** | 从零手写 VAO/VBO、Uber-Shader 框架、Bresenham/扫描线/Cohen-Sutherland 2D 沙盘、6片双三次 Bézier $C^1$ 飞檐、B 样条、平面投影阴影与 Seedream 5.5 全景天空盒 | [本页下方文档](#一-实机渲染与设计预览) / [`Course_Report.md`](docs/Course_Report.md) |
+> | **[`Computer Graphics2.0[Project_unity]`](./Computer%20Graphics2.0[Project_unity])** | **Unity 6 (`6000.6.8f1`) + C# `CGCore` + 自定义 HLSL** | 100% 保留手写图形学算法类与自定义 HLSL 着色器，新增 C++ $\to$ `.obj` 自动化资产桥接、CSM 级联软阴影 vs 手写平面投影阴影实时切换、HDR Bloom + ACES 色调映射、飞檐曲率实时滑块调参控制台 | [2.0 工程 README](./Computer%20Graphics2.0[Project_unity]/README.md) / [2.0 架构方案](./Computer%20Graphics2.0[Project_unity]/YanbianVillage_v2_Unity_Plan.md) |
 
 ---
 

@@ -23,7 +23,7 @@ namespace YanbianCG.EditorTools
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             GameObject root = new GameObject("YanbianVillage_2.0_Root");
-            root.AddComponent<YanbianSceneBootstrapper>();
+            var boot = root.AddComponent<YanbianSceneBootstrapper>();
 
             GameObject camGo = new GameObject("Main Camera");
             camGo.tag = "MainCamera";
@@ -31,6 +31,13 @@ namespace YanbianCG.EditorTools
             cam.transform.position = new Vector3(2.0f, 3.8f, 44.0f);
             cam.transform.rotation = Quaternion.Euler(3.0f, 182.0f, 0.0f);
             camGo.AddComponent<YanbianCG.FX.CameraPostProcessor>();
+
+            // 在编辑器 Scene 视图中也直接生成静态预览场景，方便不按 Play 也能在 Scene 窗口直接查看和选中物体
+            boot.BuildCompleteVillageScene();
+            if (SceneView.lastActiveSceneView != null)
+            {
+                SceneView.lastActiveSceneView.AlignViewToObject(cam.transform);
+            }
 
             string scenesDir = "Assets/Scenes";
             if (!Directory.Exists(scenesDir))

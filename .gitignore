@@ -1,0 +1,30 @@
+# Build artifacts
+build/
+bin/
+obj/
+*.o
+*.obj
+*.exe
+*.dll
+*.a
+*.lib
+*.pdb
+*.ilk
+
+# IDE / Editor directories
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile.cmake
+
+# OS & Temp
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+screenshots/

@@ -2,11 +2,18 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include "stb_image.h"
 
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <iostream>
+#include <string>
 #include <vector>
+
+#ifndef PROJECT_ROOT
+#define PROJECT_ROOT "."
+#endif
 
 namespace {
 
@@ -206,28 +213,53 @@ unsigned char toByte(float v) {
 
 unsigned int SkyGenerator::createProceduralCubemap(int presetType) {
     const int preset = std::clamp(presetType, 0, 2);
-    const SkyPalette pal = makePalette(preset);
-    std::vector<unsigned char> face(static_cast<size_t>(kFaceSize) * kFaceSize * 3);
+    const char* folderNames[3] = { "dawn", "noon", "night" };
+    const char* faceNames[6]   = { "px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png" };
 
     unsigned int texture = 0;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
+    // 优先尝试加载 Seedream 5.5 切片生成的 6 面全景天空盒纹理
+    stbi_set_flip_vertically_on_load(false);
+    bool loadedFromDisk = true;
     for (int f = 0; f < 6; ++f) {
-        for (int y = 0; y < kFaceSize; ++y) {
-            const float v = 2.0f * (y + 0.5f) / kFaceSize - 1.0f;
-            for (int x = 0; x < kFaceSize; ++x) {
-                const float u = 2.0f * (x + 0.5f) / kFaceSize - 1.0f;
-                const glm::vec3 dir = faceDirection(f, u, v);
-                const glm::vec3 color = shadeSky(dir, pal);
-                const size_t o = static_cast<size_t>(y * kFaceSize + x) * 3;
-                face[o + 0] = toByte(color.r);
-                face[o + 1] = toByte(color.g);
-                face[o + 2] = toByte(color.b);
-            }
+        std::string path = std::string(PROJECT_ROOT) + "/assets/skybox/" + folderNames[preset] + "/" + faceNames[f];
+        int w = 0, h = 0, ch = 0;
+        unsigned char* data = stbi_load(path.c_str(), &w, &h, &ch, 3);
+        if (!data) {
+            path = std::string("assets/skybox/") + folderNames[preset] + "/" + faceNames[f];
+            data = stbi_load(path.c_str(), &w, &h, &ch, 3);
+        }
+        if (!data) {
+            loadedFromDisk = false;
+            break;
         }
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + f, 0, GL_RGB8,
-                     kFaceSize, kFaceSize, 0, GL_RGB, GL_UNSIGNED_BYTE, face.data());
+                     w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        stbi_image_free(data);
+    }
+
+    if (!loadedFromDisk) {
+        const SkyPalette pal = makePalette(preset);
+        std::vector<unsigned char> face(static_cast<size_t>(kFaceSize) * kFaceSize * 3);
+
+        for (int f = 0; f < 6; ++f) {
+            for (int y = 0; y < kFaceSize; ++y) {
+                const float v = 2.0f * (y + 0.5f) / kFaceSize - 1.0f;
+                for (int x = 0; x < kFaceSize; ++x) {
+                    const float u = 2.0f * (x + 0.5f) / kFaceSize - 1.0f;
+                    const glm::vec3 dir = faceDirection(f, u, v);
+                    const glm::vec3 color = shadeSky(dir, pal);
+                    const size_t o = static_cast<size_t>(y * kFaceSize + x) * 3;
+                    face[o + 0] = toByte(color.r);
+                    face[o + 1] = toByte(color.g);
+                    face[o + 2] = toByte(color.b);
+                }
+            }
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + f, 0, GL_RGB8,
+                         kFaceSize, kFaceSize, 0, GL_RGB, GL_UNSIGNED_BYTE, face.data());
+        }
     }
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

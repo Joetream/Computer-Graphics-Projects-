@@ -132,6 +132,7 @@ void main() {
         vec3 sky = mix(texture(u_SkyTexA, R).rgb,
                        texture(u_SkyTexB, R).rgb,
                        u_SkyBlend);
+        sky = pow(max(sky, vec3(0.0)), vec3(2.2)); // sRGB cubemap -> 线性空间再参与反射混合
         float F = 0.08 + 0.92 * pow(1.0 - max(dot(N, V), 0.0), 4.0);
         color = mix(color, sky, clamp(F, 0.0, 1.0));
     }

@@ -60,12 +60,7 @@ out vec3 v_Color;
 out vec3 v_GouraudDiffuse;
 out vec3 v_GouraudSpec;
 
-const int MAX_POINT_LIGHTS = 6;
-
-// 点光源二次距离衰减：f_att = 1 / (1 + 0.14 d + 0.07 d^2)
-float pointAttenuation(float d) {
-    return 1.0 / (1.0 + 0.14 * d + 0.07 * d * d);
-}
+#include "common/lighting.glsl"
 
 void main() {
     float t = u_Time;
@@ -116,29 +111,13 @@ void main() {
     v_GouraudSpec    = vec3(0.0);
 
     if (u_ShadeMode == 1 && !u_IsShadowPass) {
-        vec3 N = worldNormal;
         vec3 V = normalize(u_CamPos - worldPos);
-        vec3 L = normalize(u_SunDir);
-        vec3 H = normalize(L + V);
-
-        float NdotL = max(dot(N, L), 0.0);
-        float NdotH = max(dot(N, H), 0.0);
-        v_GouraudDiffuse += u_SunColor * NdotL;
-        v_GouraudSpec    += u_SunColor * pow(NdotH, u_Shininess) * step(1e-4, NdotL);
-
-        for (int i = 0; i < MAX_POINT_LIGHTS; ++i) {
-            if (i >= u_NumPointLights) break;
-            vec3  toLight = u_PointLightPos[i] - worldPos;
-            float d       = length(toLight);
-            vec3  Lp      = toLight / max(d, 1e-4);
-            vec3  Hp      = normalize(Lp + V);
-            float att     = pointAttenuation(d) * u_PointLightFactor;
-
-            v_GouraudDiffuse += u_PointLightColor[i] * max(dot(N, Lp), 0.0) * att;
-            v_GouraudSpec    += u_PointLightColor[i]
-                              * pow(max(dot(N, Hp), 0.0), u_Shininess)
-                              * att * step(1e-4, max(dot(N, Lp), 0.0));
-        }
+        evaluateBlinnPhong(
+            worldPos, worldNormal, V,
+            u_SunDir, u_SunColor, u_Ambient, u_Shininess,
+            u_NumPointLights, u_PointLightPos, u_PointLightColor, u_PointLightFactor,
+            v_GouraudDiffuse, v_GouraudSpec
+        );
     }
 
     // ------------------------------------------------------------------

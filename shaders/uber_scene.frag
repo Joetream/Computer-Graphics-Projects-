@@ -55,37 +55,7 @@ uniform samplerCube u_SkyTexA;      // texture unit 1
 uniform samplerCube u_SkyTexB;      // texture unit 2
 uniform float       u_SkyBlend;
 
-const int MAX_POINT_LIGHTS = 6;
-
-// 点光源二次距离衰减：f_att = 1 / (1 + 0.14 d + 0.07 d^2)
-float pointAttenuation(float d) {
-    return 1.0 / (1.0 + 0.14 * d + 0.07 * d * d);
-}
-
-// 平行光 + 6 盏点光源的 Blinn-Phong 逐片元光照
-void blinnPhong(vec3 N, vec3 V, out vec3 diffuse, out vec3 spec) {
-    vec3 L = normalize(u_SunDir);
-    vec3 H = normalize(L + V);
-    float NdotL = max(dot(N, L), 0.0);
-    float NdotH = max(dot(N, H), 0.0);
-
-    diffuse = u_Ambient + u_SunColor * NdotL;
-    spec    = u_SunColor * pow(NdotH, u_Shininess) * step(1e-4, NdotL);
-
-    for (int i = 0; i < MAX_POINT_LIGHTS; ++i) {
-        if (i >= u_NumPointLights) break;
-        vec3  toLight = u_PointLightPos[i] - v_WorldPos;
-        float d       = length(toLight);
-        vec3  Lp      = toLight / max(d, 1e-4);
-        vec3  Hp      = normalize(Lp + V);
-        float att     = pointAttenuation(d) * u_PointLightFactor;
-
-        diffuse += u_PointLightColor[i] * max(dot(N, Lp), 0.0) * att;
-        spec    += u_PointLightColor[i]
-                 * pow(max(dot(N, Hp), 0.0), u_Shininess)
-                 * att * step(1e-4, max(dot(N, Lp), 0.0));
-    }
-}
+#include "common/lighting.glsl"
 
 void main() {
     // ------------------------------------------------------------------
@@ -143,7 +113,12 @@ void main() {
         diffuse = v_GouraudDiffuse;
         spec    = v_GouraudSpec;
     } else {
-        blinnPhong(N, V, diffuse, spec);
+        evaluateBlinnPhong(
+            v_WorldPos, N, V,
+            u_SunDir, u_SunColor, u_Ambient, u_Shininess,
+            u_NumPointLights, u_PointLightPos, u_PointLightColor, u_PointLightFactor,
+            diffuse, spec
+        );
     }
 
     vec3 color = albedo * diffuse + spec;

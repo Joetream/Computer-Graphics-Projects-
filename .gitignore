@@ -1,0 +1,27 @@
+# Build artifacts
+*.exe
+*.o
+*.obj
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# Build directories
+build/
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+
+# IDE files
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+
+# OS files
+.DS_Store
+Thumbs.db
